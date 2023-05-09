@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\RegisteredUserController;
 use App\Http\Controllers\Api\V1\AuthenticatedController;
+use App\Http\Controllers\Api\V1\FormController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,5 +25,9 @@ Route::prefix('v1')->group(function () {
 
     Route::post('register', [RegisteredUserController::class, 'store']);
     Route::post('login', [AuthenticatedController::class, 'login']);
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('forms', [FormController::class, 'store']);
+    });
 
 });
