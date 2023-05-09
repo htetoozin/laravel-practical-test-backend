@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseController;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use App\Models\User;
 
-class RegisteredUserController extends Controller
+class RegisteredUserController extends BaseController
 {
      /**
      * Create user register
@@ -26,8 +26,9 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'min:8'],
         ]);
 
+
         if ($validator->fails()) {
-            return response(['error' => $validator->errors()->first()], 422);
+            return $this->responseError($validator->errors()->first(), 422);
         }
 
         $data = $validator->validated();
@@ -35,10 +36,14 @@ class RegisteredUserController extends Controller
         $user = User::create($data);
         $token = $user->createToken(config('app.sanctum_key'))->plainTextToken;
 
-        return response()->json([
-            'code' => 200,
+
+        $response = array_merge([],[
+            'code' =>  '200',
+            'status' => 'success',
             'user' => new UserResource($user),
-            'token' => $token,
-        ], 200);
+            'token' => $token
+        ]);
+
+        return $response;
     }
 }

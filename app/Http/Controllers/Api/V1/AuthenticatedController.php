@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseController;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use App\Models\User;
 
-class AuthenticatedController extends Controller
+class AuthenticatedController extends BaseController
 {
     /**
      * Login user
@@ -22,26 +22,32 @@ class AuthenticatedController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'email'     => ['required', 'email'],
-            'password'  => ['required'],
+            'password'  => ['required', 'min:4'],
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()->first()], 422);
+            return $this->responseError($validator->errors()->first(), 422);
         }
 
         $user = User::where('email', $request->email)->first();
  
         if (!$user || ! \Hash::check($request->password, $user->password)) {
-            return response()->json(['error' => 'The provided credentials are incorrect.'], 422);
+            
+            $message = 'The provided credentials are incorrect.';
+            return $this->responseError($message, 422);
         }
 
         $user->tokens()->delete();
         
         $token = $user->createToken(config('app.sanctum_key'))->plainTextToken;
 
-        return response()->json([
+         $response = array_merge([],[
+            'code' =>  '200',
+            'status' => 'success',
             'user' => new UserResource($user),
-            'token' => $token,
+            'token' => $token
         ]);
+
+        return $response;
     }
 }

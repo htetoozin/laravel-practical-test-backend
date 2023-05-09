@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers\Api\v1;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseController;
+use App\Http\Resources\FormResource;
 use App\Events\FormProcessed;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -11,7 +12,7 @@ use App\Models\Form;
 use Validator;
 
 
-class FormController extends Controller
+class FormController extends BaseController
 {
     public function store(Request $request) 
     {
@@ -22,7 +23,7 @@ class FormController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 422);
+            return $this->responseError($validator->errors()->first(), 422);
         }
 
         $attributes = $validator->validated();
@@ -37,7 +38,13 @@ class FormController extends Controller
 
         $link = config('app.url') . "/forms/{$form->token}"; 
         FormProcessed::dispatch($attributes['customer_email'], $form, $link);
-        
-        return response()->json(['success' => true]);
+
+        $response = array_merge([],[
+            'code' =>  '200',
+            'status' => 'success',
+            'data' => new FormResource($form),
+        ]);
+
+        return $response;
     }
 }

@@ -25,14 +25,10 @@ class APIException extends Exception
                             'Method not allowed.' : 
                             $handler->getMessage();               
                              
-        $message = [
-            'error' => $errorMessage
-        ];
-
         return response()->json([
             'code'      => $handler->getStatusCode(),
             'status'    => 'failed',
-            'message'   => $message
+            'message'   => $errorMessage
         ], $handler->getStatusCode());
     }
 }
