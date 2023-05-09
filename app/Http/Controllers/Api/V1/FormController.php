@@ -16,7 +16,7 @@ class FormController extends Controller
             'title' => ['required', 'string'],
             'fields' => ['required', 'string'],
         ]);
-        
+
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], 422);
         }
