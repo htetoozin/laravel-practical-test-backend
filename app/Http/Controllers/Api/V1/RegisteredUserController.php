@@ -36,8 +36,9 @@ class RegisteredUserController extends Controller
         $token = $user->createToken(config('app.sanctum_key'))->plainTextToken;
 
         return response()->json([
+            'code' => 200,
             'user' => new UserResource($user),
             'token' => $token,
-        ]);
+        ], 200);
     }
 }
