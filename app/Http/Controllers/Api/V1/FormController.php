@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
+use App\Events\FormProcessed;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
-use App\Mail\SurveryForm;
 use App\Models\Form;
 use Validator;
-use Mail;
+
 
 class FormController extends Controller
 {
@@ -25,9 +25,9 @@ class FormController extends Controller
             return response()->json(['error' => $validator->errors()], 422);
         }
 
-        $data = $validator->validated();
+        $attributes = $validator->validated();
 
-        $form = Arr::except($data, ['customer_email']);
+        $form = Arr::except($attributes, ['customer_email']);
 
         $form['user_id'] = auth()->id();
         $form['fields'] = json_decode($form['fields']);
@@ -36,7 +36,7 @@ class FormController extends Controller
         $form = Form::create($form);
 
         $link = config('app.url') . "/forms/{$form->token}"; 
-        Mail::to($data['customer_email'])->send(new SurveryForm($form, $link));
+        FormProcessed::dispatch($attributes['customer_email'], $form, $link);
         
         return response()->json(['success' => true]);
     }

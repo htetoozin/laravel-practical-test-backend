@@ -30,7 +30,7 @@ class SurveryForm extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Survery Form',
+            subject: 'Surveys and Questionnaires Form',
         );
     }
 

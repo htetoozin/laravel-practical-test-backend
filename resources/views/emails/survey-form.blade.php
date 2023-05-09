@@ -1,10 +1,10 @@
 @component('mail::message')
 # {{ $form->title }}
   
-The body of your message.
+I've invited you to fill out a form:
   
 @component('mail::button', ['url' => $link ])
-Fill Out
+Fill Out Form
 @endcomponent
   
 Thanks,
